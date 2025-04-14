@@ -1,8 +1,8 @@
 {
     :global userInput do={
         :local input [:terminal ask]
-        :put "$input, $a"
+        :put "$input, $arg1"
     }
     
-    $userInput a="test"
+    $userInput "test123"
 }
