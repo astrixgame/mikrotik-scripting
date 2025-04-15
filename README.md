@@ -1,7 +1,5 @@
 # MikroTik Scripting
-Collection of MikroTik scripts
-
-
+Collection of universal MikroTik scripts for quick configuration
 
 ## License
 [Apache-2.0](LICENSE)
