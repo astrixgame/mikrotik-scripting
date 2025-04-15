@@ -1,4 +1,4 @@
-# Full MikroTik configuration script
+# MikroTik Full config setup
 
 :global read do={:return}
 
