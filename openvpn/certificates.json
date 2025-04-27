@@ -1,0 +1,77 @@
+{
+    "title": "OpenVPN Certificates",
+    "groups": {
+        "ca": {
+            "title": "CA Certificate",
+            "fields": {
+                "cacrt_name": {
+                    "text": "Certificate name",
+                    "default": "OVPN_CA"
+                },
+                "cacrt_cname": {
+                    "text": "Common name",
+                    "default": "OVPN_CA"
+                },
+                "cacrt_host": {
+                    "text": "CRL host",
+                    "default": null
+                },
+                "cacrt_size": {
+                    "text": "Key size",
+                    "default": 4096
+                },
+                "cacrt_valid": {
+                    "text": "Days valid",
+                    "default": 3650
+                }
+            }
+        },
+        "server": {
+            "title": "Server Certificate",
+            "fields": {
+                "srvcrt_name": {
+                    "text": "Certificate name",
+                    "default": "OVPN_Server"
+                },
+                "srvcrt_cname": {
+                    "text": "Common name",
+                    "default": "OVPN_Server"
+                },
+                "srvcrt_size": {
+                    "text": "Key size",
+                    "default": 4096
+                },
+                "srvcrt_valid": {
+                    "text": "Days valid",
+                    "default": 3650
+                }
+            }
+        },
+        "client": {
+            "title": "Client Certificate",
+            "fields": {
+                "clcrt_create": {
+                    "text": "Generate client certificate?:",
+                    "default": "Yes"
+                },
+                "clcrt_name": {
+                    "text": "Certificate name",
+                    "default": "OVPN_Client"
+                },
+                "clcrt_cname": {
+                    "text": "Common name",
+                    "default": "OVPN_Client"
+                },
+                "clcrt_size": {
+                    "text": "Key size",
+                    "default": 4096
+                },
+                "clcrt_valid": {
+                    "text": "Days valid",
+                    "default": 3650
+                }
+            }
+        }
+        
+    }
+}

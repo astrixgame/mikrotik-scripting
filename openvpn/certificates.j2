@@ -1,0 +1,15 @@
+/certificate
+add name="{{ cacrt_name }}" common-name="{{ cacrt_cname }}" key-size={{ cacrt_size }} days-valid={{ cacrt_valid }} key-usage=crl-sign,key-cert-sign
+sign "{{ cacrt_name }}" ca-crl-host="{{ cacrt_host }}"
+
+add name="{{ srvcrt_name }}" common-name="{{ srvcrt_cname }}" key-size={{ srvcrt_size }} days-valid={{ srvcrt_valid }} key-usage=digital-signature,key-encipherment,tls-server
+sign {{ srvcrt_name }} ca="{{ cacrt_name }}"
+set {{ srvcrt_name }} trusted=yes
+
+{% if clcrt_create %}
+
+add name="{{ clcrt_name }}" common-name="{{ clcrt_cname }}" key-size={{ clcrt_size }} days-valid={{ clcrt_valid }} key-usage=tls-client
+sign {{ clcrt_name }} ca="{{ cacrt_name }}"
+set {{ clcrt_name }} trusted=yes
+
+{% endif %}
