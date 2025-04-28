@@ -1,0 +1,18 @@
+/ip pool
+add name="{{ pool_name | default('dhcp-pool') }}" ranges={{ pool_range | default('192.168.88.100-192.168.88.200') }}
+
+/ip dhcp-server
+add address-pool="{{ pool_name | default('dhcp-pool') }}" interface={{ interface | default('bridge1') }} name="{{ server_name | default('dhcp1') }}" disabled=no
+
+/ip dhcp-server network
+add address={{ network | default('192.168.88.0/24') }} gateway={{ gateway | default('192.168.88.1') }} dns-server="{{ dns1 | default('8.8.8.8') }},{{ dns2 | default('8.8.4.4') }}"
+
+{% if domain is defined %}
+/ip dns
+set allow-remote-requests=yes servers="{{ dns1 | default('8.8.8.8') }},{{ dns2 | default('8.8.4.4') }}"
+{% endif %}
+
+{% if ntp is defined and ntp %}
+/system ntp client
+set enabled=yes primary-ntp={{ primary_ntp | default('pool.ntp.org') }} secondary-ntp={{ secondary_ntp | default('time.google.com') }}
+{% endif %}

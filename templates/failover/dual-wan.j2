@@ -1,0 +1,23 @@
+/ip route
+add check-gateway=ping distance=1 gateway={{ primary_gateway }} comment="Primary WAN"
+add check-gateway=ping distance=2 gateway={{ secondary_gateway }} comment="Secondary WAN"
+
+/ip firewall mangle
+add action=mark-connection chain=prerouting connection-state=new in-interface={{ primary_interface | default('ether1') }} new-connection-mark=wan1_conn passthrough=yes comment="Mark Primary WAN connections"
+add action=mark-connection chain=prerouting connection-state=new in-interface={{ secondary_interface | default('ether2') }} new-connection-mark=wan2_conn passthrough=yes comment="Mark Secondary WAN connections"
+add action=mark-routing chain=prerouting connection-mark=wan1_conn new-routing-mark=to_wan1 passthrough=yes comment="Mark Primary WAN routing"
+add action=mark-routing chain=prerouting connection-mark=wan2_conn new-routing-mark=to_wan2 passthrough=yes comment="Mark Secondary WAN routing"
+
+/ip route
+add check-gateway=ping distance=1 gateway={{ primary_gateway }} routing-mark=to_wan1 comment="Route marked Primary WAN traffic"
+add check-gateway=ping distance=1 gateway={{ secondary_gateway }} routing-mark=to_wan2 comment="Route marked Secondary WAN traffic"
+
+{% if load_balance | default(false) %}
+/ip firewall mangle
+add action=mark-connection chain=prerouting connection-state=new per-connection-classifier=both-addresses:2/0 new-connection-mark=wan1_conn passthrough=yes comment="Load Balance - WAN1"
+add action=mark-connection chain=prerouting connection-state=new per-connection-classifier=both-addresses:2/1 new-connection-mark=wan2_conn passthrough=yes comment="Load Balance - WAN2"
+{% endif %}
+
+/tool netwatch
+add comment="Primary WAN Monitor" down-script="/ip route set [find comment=\"Primary WAN\"] disable=yes; /log error \"Primary WAN down\"" host={{ monitor_host | default('8.8.8.8') }} interval={{ monitor_interval | default('30s') }} up-script="/ip route set [find comment=\"Primary WAN\"] disable=no; /log info \"Primary WAN up\""
+add comment="Secondary WAN Monitor" down-script="/ip route set [find comment=\"Secondary WAN\"] disable=yes; /log error \"Secondary WAN down\"" host={{ monitor_host | default('8.8.4.4') }} interval={{ monitor_interval | default('30s') }} up-script="/ip route set [find comment=\"Secondary WAN\"] disable=no; /log info \"Secondary WAN up\""

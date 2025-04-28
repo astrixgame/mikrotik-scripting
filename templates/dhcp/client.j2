@@ -1,0 +1,10 @@
+/ip dhcp-client
+add interface={{ interface | default('ether1') }} use-peer-dns={{ use_peer_dns | default('yes') }} use-peer-ntp={{ use_peer_ntp | default('yes') }} add-default-route={{ add_default_route | default('yes') }} disabled=no
+
+{% if hostname is defined %}
+/system identity
+set name="{{ hostname }}"
+{% endif %}
+
+/tool netwatch
+add comment="WAN Monitor" down-script="/log error \"WAN connection down\"" host={{ monitor_host | default('8.8.8.8') }} interval={{ monitor_interval | default('30s') }} up-script="/log info \"WAN connection up\""

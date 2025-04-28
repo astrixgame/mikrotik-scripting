@@ -1,2 +1,14 @@
 /interface vlan
 add name="cetin-vlan" vlan-id=848 interface={{ interface | default('ether1') }}
+
+/interface pppoe-client
+add name="cetin-pppoe" interface=cetin-vlan user="{{ username | default('pppoe') }}" password="{{ password | default('pppoe') }}" add-default-route=yes use-peer-dns=yes disabled=no
+
+/ip route
+add check-gateway=ping distance=1 gateway=cetin-pppoe
+
+/ppp profile
+set default dns-server="{{ dns1 | default('8.8.8.8') }},{{ dns2 | default('8.8.4.4') }}"
+
+/tool netwatch
+add comment="CETIN Callout" down-script="/log error \"CETIN PPPoE down\"" host=8.8.8.8 interval=30s up-script="/log info \"CETIN PPPoE up\""

@@ -1,0 +1,39 @@
+/interface lte
+set [ find default-name=lte1 ] name=lte1 disabled=no
+
+/ip route
+add check-gateway=ping distance=1 gateway={{ wan_gateway }} comment="Primary WAN"
+add check-gateway=ping distance=10 gateway=lte1 comment="LTE Backup"
+
+{% if use_sim_config | default(false) %}
+/interface lte apn
+set [ find default=yes ] apn={{ apn }} user={{ username | default('') }} password={{ password | default('') }} add-default-route=no
+{% endif %}
+
+/system script
+add name="wan_monitor" source={
+    :local pingTarget {{ monitor_host | default('8.8.8.8') }}
+    :local primaryRoute [/ip route find where comment="Primary WAN"]
+    :local backupRoute [/ip route find where comment="LTE Backup"]
+    :local pingCount 0
+    :local maxFails 3
+    
+    :for i from=1 to=3 do={
+        :if ([/ping $pingTarget count=1 routing-table=main] = 0) do={
+            :set pingCount ($pingCount + 1)
+        }
+    }
+    
+    :if ($pingCount >= $maxFails) do={
+        /ip route disable $primaryRoute
+        /ip route enable $backupRoute
+        /log error "WAN down, switched to LTE backup"
+    } else {
+        /ip route enable $primaryRoute
+        /ip route disable $backupRoute
+        /log info "WAN up, using primary connection"
+    }
+}
+
+/system scheduler
+add interval={{ check_interval | default('1m') }} name="check_wan_status" start-time=startup on-event=wan_monitor
