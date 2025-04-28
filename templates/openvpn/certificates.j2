@@ -1,15 +1,13 @@
 /certificate
-add name="{{ cacrt_name }}" common-name="{{ cacrt_cname }}" key-size={{ cacrt_size }} days-valid={{ cacrt_valid }} key-usage=crl-sign,key-cert-sign
-sign "{{ cacrt_name }}" ca-crl-host="{{ cacrt_host }}"
+add name="{{ cacrt_name | default('OVPN_CA') }}" common-name="{{ cacrt_cname | default('OVPN_CA') }}" key-size={{ cacrt_size | default('4096') }} days-valid={{ cacrt_valid | default('3650') }} key-usage=crl-sign,key-cert-sign
+sign "{{ cacrt_name | default('OVPN_CA') }}" ca-crl-host="{{ cacrt_host }}"
 
-add name="{{ srvcrt_name }}" common-name="{{ srvcrt_cname }}" key-size={{ srvcrt_size }} days-valid={{ srvcrt_valid }} key-usage=digital-signature,key-encipherment,tls-server
-sign {{ srvcrt_name }} ca="{{ cacrt_name }}"
-set {{ srvcrt_name }} trusted=yes
+add name="{{ srvcrt_name | default('OVPN_Server') }}" common-name="{{ srvcrt_cname | default('OVPN_Server') }}" key-size={{ srvcrt_size | default('4096') }} days-valid={{ srvcrt_valid | default('3650') }} key-usage=digital-signature,key-encipherment,tls-server
+sign {{ srvcrt_name | default('OVPN_Server') }} ca="{{ cacrt_name | default('OVPN_CA') }}"
+set {{ srvcrt_name | default('OVPN_Server') }} trusted=yes
 
-{% if clcrt_create %}
-
-add name="{{ clcrt_name }}" common-name="{{ clcrt_cname }}" key-size={{ clcrt_size }} days-valid={{ clcrt_valid }} key-usage=tls-client
-sign {{ clcrt_name }} ca="{{ cacrt_name }}"
-set {{ clcrt_name }} trusted=yes
-
+{% if clcrt_create == "yes" %}
+add name="{{ clcrt_name | default('OVPN_Client') }}" common-name="{{ clcrt_cname | default('OVPN_Client') }}" key-size={{ clcrt_size | default('4096') }} days-valid={{ clcrt_valid | default('3650') }} key-usage=tls-client
+sign {{ clcrt_name | default('OVPN_Client') }} ca="{{ cacrt_name | default('OVPN_CA') }}"
+set {{ clcrt_name | default('OVPN_Client') }} trusted=yes
 {% endif %}
