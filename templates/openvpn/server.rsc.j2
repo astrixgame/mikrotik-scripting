@@ -1,0 +1,5 @@
+/interface ovpn-server server
+add auth={{ auth }} certificate=SERVER cipher={{ cipher }} \
+    default-profile=ovpn-profile1 disabled=no name=\
+    ovpn-server1 netmask=20 port=35324 push-routes="" \
+    require-client-certificate=yes tls-version=only-1.2 user-auth-method=mschap2
